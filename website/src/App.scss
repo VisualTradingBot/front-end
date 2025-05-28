@@ -83,6 +83,9 @@ header {
     width: 50%;
     .explore {
       min-width: 150px;
+      background-color: #000000;
+      color: #f3f3f3;
+      border-color: #f3f3f3;
     }
   }
   .landing_2 {
@@ -91,5 +94,65 @@ header {
       width: 100%;
       height: auto;
     }
+  }
+}
+
+.sponsors {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 0px 5%;
+  padding-bottom: 60px;
+  list-style: none;
+
+  .sponsor-logo {
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+    margin: 0 20px;
+    img {
+      width: 100%;
+      height: auto;
+    }
+  }
+}
+
+.boxes-container {
+  display: grid;
+  //template for 2 columns
+  grid-template-columns: auto auto;
+  grid-template-rows: auto;
+  padding-bottom: 60px;
+  row-gap: 7%;
+  column-gap: 5%;
+
+  .box {
+    width: 70%;
+    height: 250px;
+    border: #000000 solid 1px;
+    border-radius: 15px;
+    padding: 5px;
+    background-color: #f3f3f3;
+    box-shadow: 0 0 0 0;
+    margin-left: 0;
+    margin-right: 0;
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0.2, 0.2, 1),
+      transform 0.2s cubic-bezier(0.4, 0.2, 0.2, 1);
+
+    &:hover {
+      box-shadow: #000000 10px 10px 0px;
+      transform: translate3d(-10px, -10px, 0);
+    }
+  }
+
+  .box:nth-child(odd) {
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .box:nth-child(even) {
+    margin-left: 0;
+    margin-right: auto;
   }
 }
