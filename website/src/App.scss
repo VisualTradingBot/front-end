@@ -120,20 +120,18 @@ header {
 
 .boxes-container {
   display: grid;
-  //template for 2 columns
-  grid-template-columns: auto auto;
-  grid-template-rows: auto;
-  padding-bottom: 60px;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 60px;
   row-gap: 7%;
   column-gap: 5%;
+  min-height: 1000px;
 
   .box {
     width: 70%;
-    height: 250px;
+    min-height: 250px;
     border: #000000 solid 1px;
     border-radius: 15px;
-    padding: 5px;
-    background-color: #f3f3f3;
+    padding: 10px;
     box-shadow: 0 0 0 0;
     margin-left: 0;
     margin-right: 0;
@@ -146,13 +144,131 @@ header {
     }
   }
 
-  .box:nth-child(odd) {
+  :nth-child(odd) {
     margin-left: auto;
     margin-right: 0;
   }
 
-  .box:nth-child(even) {
+  :nth-child(even) {
     margin-left: 0;
     margin-right: auto;
+  }
+
+  :nth-child(3n + 1) {
+    background-color: #f3f3f3;
+  }
+  :nth-child(3n + 3) {
+    background-color: #191a23;
+    color: #f3f3f3;
+    border: #f3f3f3 solid 1px;
+  }
+  :nth-child(3n + 2) {
+    background-color: #b9ff66;
+  }
+}
+
+.motive-container {
+  display: grid;
+  align-items: center;
+  justify-items: center; // Center items horizontally
+  height: auto;
+  min-height: 170px;
+  background-color: #e9e8e8;
+  border-radius: 15px;
+  text-align: center;
+  font-size: 1.2em;
+  color: #000000;
+  grid-template-columns: 60% 40%; // 1fr for text, fixed for image
+  grid-template-rows: auto auto;
+  width: 80%; // Constrain overall width
+  margin: 0 auto 40px auto; // Center container
+  border-radius: 50px;
+  row-gap: 30px;
+  padding: 3% 3%;
+
+  h2,
+  p {
+    grid-column: 1 / span 1;
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    text-align: left;
+  }
+
+  h2 {
+    grid-row: 1;
+  }
+
+  p {
+    grid-row: 2;
+  }
+
+  img {
+    position: absolute;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    max-width: 350px;
+    height: auto;
+    right: 0;
+  }
+}
+
+.drop-tile {
+  transition: background-color 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  height: 100%;
+  background-color: #f3f3f3;
+  border-radius: 30px;
+  border: #000000 solid 1px;
+  padding: 3% 3%;
+  margin: 20px auto;
+  div:nth-child(1) {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    h1 {
+      margin: 0;
+    }
+    button {
+      background-color: transparent;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: large;
+    }
+  }
+
+  div:nth-child(2) {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #000000;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0.2, 0.2, 1), opacity 0.3s,
+      padding-top 0.3s cubic-bezier(0.4, 0.2, 0.2, 1),
+      margin-top 0.3s cubic-bezier(0.4, 0.2, 0.2, 1),
+      background-color 0.3s cubic-bezier(0.4, 0.2, 0.2, 1);
+    p {
+      margin: 0;
+    }
+  }
+
+  .open {
+    max-height: 400px !important; // adjust as needed
+    opacity: 1 !important;
+    padding-top: 20px;
+    margin-top: 20px;
   }
 }

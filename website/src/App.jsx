@@ -1,4 +1,4 @@
-//import { useState } from "react";
+import { useState } from "react";
 import "./App.scss";
 import "./reusable_style.scss";
 import { Button } from "./reusable.jsx";
@@ -10,6 +10,31 @@ export default function App() {
       <LandingMain />
       <Sponsors />
       <Boxes />
+      <Motive />
+      <DropDownTile n="01">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ut
+        neque vel eros lobortis scelerisque eget ut ipsum. Cras scelerisque
+        massa at mi egestas, in ullamcorper odio tincidunt. Nam vitae lobortis
+        purus.
+      </DropDownTile>
+      <DropDownTile n="02">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ut
+        neque vel eros lobortis scelerisque eget ut ipsum. Cras scelerisque
+        massa at mi egestas, in ullamcorper odio tincidunt. Nam vitae lobortis
+        purus.
+      </DropDownTile>
+      <DropDownTile n="03">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ut
+        neque vel eros lobortis scelerisque eget ut ipsum. Cras scelerisque
+        massa at mi egestas, in ullamcorper odio tincidunt. Nam vitae lobortis
+        purus.
+      </DropDownTile>
+      <DropDownTile n="04">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ut
+        neque vel eros lobortis scelerisque eget ut ipsum. Cras scelerisque
+        massa at mi egestas, in ullamcorper odio tincidunt. Nam vitae lobortis
+        purus.
+      </DropDownTile>
     </>
   );
 }
@@ -49,14 +74,11 @@ function LandingMain() {
     <div className="landing">
       <div className="landing_1">
         <h1>Welcome to Our Service</h1>
-        <p>Your satisfaction is our priority.</p>
+        <p>cows...</p>
         <Button classes="explore">Explore Services</Button>
       </div>
       <div className="landing_2">
-        <img
-          src="https://www.shutterstock.com/shutterstock/photos/2447402373/display_1500/stock-vector-poor-or-poverty-with-empty-wallet-financial-problem-trouble-to-pay-loan-bankruptcy-or-2447402373.jpg"
-          alt="poor_shutterstock"
-        />
+        <img src="./img.jpg" alt="poor_shutterstock" />
       </div>
     </div>
   );
@@ -155,6 +177,40 @@ function Boxes() {
       <div className="box">smt</div>
       <div className="box">smt</div>
       <div className="box">smt</div>
+      <div className="box">smt</div>
+    </div>
+  );
+}
+
+function Motive() {
+  return (
+    <div className="motive-container">
+      <h2>motivational...</h2>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse ut
+        neque vel eros lobortis scelerisque eget ut ipsum. Cras scelerisque
+        massa at mi egestas, in ullamcorper odio tincidunt. Nam vitae lobortis
+        purus.
+      </p>
+      <img src="motive.png" />
+    </div>
+  );
+}
+
+function DropDownTile({ n, children }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div
+      className="drop-tile"
+      style={{ backgroundColor: isOpen ? "#b9ff66" : "" }}
+    >
+      <div>
+        <h1>{n}</h1>
+        <button onClick={() => setIsOpen((o) => !o)}>
+          {isOpen ? "-" : "+"}
+        </button>
+      </div>
+      <div className={`${isOpen ? "open" : ""}`}>{children}</div>
     </div>
   );
 }
