@@ -1,0 +1,179 @@
+.box {
+  background: #0a0263;
+  border: 1px solid #b2b1b9;
+  border-radius: 2px;
+  width: 7vw;
+  min-width: 180px;
+  height: 15vh;
+  min-height: fit-content;
+  padding: 5px;
+  flex-direction: column;
+  display: grid;
+  grid-template: auto / 20px auto 20px;
+  color: aliceblue;
+
+  h3,
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+  p {
+    font-size: 0.8rem;
+    font-weight: 300;
+  }
+
+  .main-contents {
+    grid-row: 1;
+    grid-column: 2;
+    font-family: "Ubuntu";
+    display: flex;
+    flex-direction: column;
+
+    .box-title,
+    .box-content {
+      margin: 0;
+      padding: 5px 0;
+    }
+
+    .box-title {
+      border-bottom: aliceblue solid 1px;
+    }
+
+    .box-content {
+      input {
+        margin: 0;
+        border: 0;
+        width: 100%;
+        background-color: transparent;
+        color: aliceblue;
+        font-family: "Ubuntu";
+      }
+    }
+  }
+
+  .right-connections {
+    grid-row: 1;
+    grid-column: 3;
+  }
+
+  .left-connections {
+    grid-row: 1;
+    grid-column: 1;
+  }
+}
+
+.box-preset {
+  transition: background-color 0.2s ease-in-out;
+  opacity: 0;
+  transform: scale(0.5);
+  animation: boxPresetIn 0.3s forwards;
+  // Mouse hover effect
+  &:hover {
+    background-color: #b2b1b9;
+  }
+  /*BOX PRESET*/
+  background: transparent;
+  border-radius: 15px;
+  width: fit-content;
+  padding: 0 15px;
+  color: aliceblue;
+
+  h4 {
+    margin: 0;
+    padding: 0;
+    font-family: "Ubuntu";
+  }
+}
+
+.box-picker {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 15vw;
+  min-width: 270px;
+  height: 98.5vh;
+  z-index: 99;
+  padding: 10px;
+  background-color: #131313;
+  display: flex;
+  flex-direction: column;
+
+  h2 {
+    margin: 0;
+    padding-bottom: 2.5px;
+    font-family: "Ubuntu";
+    color: aliceblue;
+  }
+
+  .carousel {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 1px;
+
+    .carousel-button {
+      background-color: #504f4f;
+      border: 1px solid #b2b1b9;
+      border-radius: 5px;
+      color: aliceblue;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background-color 0.2s ease-in-out;
+      flex-shrink: 0;
+
+      &:hover {
+        background-color: #b2b1b9;
+        color: #131313;
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      &.left {
+        margin-right: 10px;
+      }
+
+      &.right {
+        margin-left: 10px;
+      }
+    }
+
+    .component-list {
+      display: flex;
+      flex-direction: row;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 5px;
+      flex: 1;
+      scroll-behavior: smooth;
+
+      /* Hide scrollbar for cleaner look */
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+      &::-webkit-scrollbar {
+        /* WebKit */
+        display: none;
+      }
+
+      .box-preset {
+        margin-right: 10px;
+        cursor: pointer;
+        flex-shrink: 0; /* Prevent items from shrinking */
+
+        &:hover {
+          background-color: #b2b1b9;
+        }
+      }
+    }
+  }
+}

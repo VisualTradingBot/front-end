@@ -1,8 +1,7 @@
 import "./App.scss";
 import { useCallback, useState, useRef, useEffect } from "react";
+import { Box, ComponentPicker } from "./components.jsx"; // Import components
 import ReactFlow, {
-  Handle,
-  Position,
   addEdge,
   Background,
   BackgroundVariant,
@@ -11,70 +10,27 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-const PRESET_NODES = [
-  { type: "custom", label: "Box", color: "#2a7b9b" },
-  { type: "custom", label: "Box", color: "#2a7b9b" },
+const PRESET_NODES_ACTIONS = [
+  { type: "inputBox", label: "Input" },
+  { type: "whileBox", label: "While" },
+  { type: "notifyBox", label: "Notify" },
+  { type: "executeBox", label: "Execute" },
+  { type: "ifBox", label: "If" },
   // Add more presets here if needed
 ];
 
-// Update Box to allow message input and show received message
-function Box({ id, data, preview, dragged }) {
-  return (
-    <div
-      className="box"
-      style={{
-        pointerEvents: preview ? "none" : {},
-        opacity: dragged ? 0.5 : 1,
-      }}
-    >
-      {!preview && (
-        <div className="left-connections">
-          <Handle
-            key={`left`}
-            type="target"
-            position={Position.Left}
-            id={`left`}
-            style={{ top: "50%", left: "2%" }}
-          />
-        </div>
-      )}
-      <div className="main-contents">
-        <div className="box-title">
-          <h3>{data?.label || "title"}</h3>
-        </div>
-        <div className="box-content">
-          <input
-            id={`message-input-${id}`}
-            className="nodrag"
-            type="text"
-            value={data?.message || ""}
-            onChange={(e) => data?.onMessageChange?.(id, e.target.value)}
-            placeholder="Type a message"
-            disabled={preview}
-          />
-          {data?.receivedMessage && (
-            <div className="received-message">
-              <strong>Received:</strong> {data.receivedMessage}
-            </div>
-          )}
-        </div>
-      </div>
-      {!preview && (
-        <div className="right-connections">
-          <Handle
-            key={`right`}
-            type="source"
-            position={Position.Right}
-            id={`right`}
-            style={{ top: `50%`, right: "2%" }}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
+const PRESET_NODES_SOMETHING = [
+  { type: "somethingBox", label: "Input Something" },
+];
 
-const nodeTypes = { custom: Box };
+const nodeTypes = {
+  inputBox: Box,
+  whileBox: Box,
+  notifyBox: Box,
+  executeBox: Box,
+  ifBox: Box,
+  somethingBox: Box,
+}; // Register Box as a node type
 
 export default function App() {
   const [nodes, setNodes] = useState([]);
@@ -165,7 +121,8 @@ export default function App() {
     (event) => {
       event.preventDefault();
       const reactFlowBounds = event.target.getBoundingClientRect();
-      const type = event.dataTransfer.getData("application/reactflow");
+      const data = event.dataTransfer.getData("application/reactflow");
+      const [type, label] = data.split(",");
       if (!type) return;
 
       // Calculate position relative to canvas
@@ -173,16 +130,17 @@ export default function App() {
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       };
+      console.log("Dropped type:", type, "at position:", position);
 
       // when dropping, the box should be placed where the pointer is
       setNodes((nds) => [
         ...nds,
         {
           id: `${+new Date()}`,
-          type,
+          type: type,
           position: position,
           data: {
-            label: `Box ${nds.length + 1}`,
+            label: `${label}`,
             onMessageChange, // add function reference
           },
         },
@@ -209,18 +167,16 @@ export default function App() {
       </ReactFlow>
 
       <div className="box-picker">
-        {PRESET_NODES.map((preset, idx) => (
-          <div
-            key={idx}
-            className={`box-preset`}
-            draggable
-            onDragStart={(event) => {
-              event.dataTransfer.setData("application/reactflow", preset.type);
-            }}
-          >
-            <Box data={{ label: preset.label }} preview />
-          </div>
-        ))}
+        <ComponentPicker
+          PRESET_NODES={PRESET_NODES_ACTIONS}
+          title="Actions"
+          nameComponentClass={"action-picker"}
+        />
+        <ComponentPicker
+          PRESET_NODES={PRESET_NODES_SOMETHING}
+          title="Something"
+          nameComponentClass={"something-picker"}
+        />
       </div>
     </div>
   );
