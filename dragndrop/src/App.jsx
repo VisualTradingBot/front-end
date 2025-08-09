@@ -1,6 +1,10 @@
 import "./App.scss";
-import { useCallback, useState, useRef, useEffect } from "react";
-import { Box, ComponentPicker } from "./components.jsx"; // Import components
+import ComponentPickerRow from "./ComponentPickerRow.jsx";
+import { SetVariableNode } from "./Nodes.jsx";
+import ParameterDashboard from "./ParameterDashboard.jsx";
+import { CustomBezierEdge } from "./components.jsx";
+
+import { useCallback, useState, useEffect } from "react";
 import ReactFlow, {
   addEdge,
   Background,
@@ -10,105 +14,64 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
-const PRESET_NODES_ACTIONS = [
-  { type: "inputBox", label: "Input" },
-  { type: "whileBox", label: "While" },
-  { type: "notifyBox", label: "Notify" },
-  { type: "executeBox", label: "Execute" },
-  { type: "ifBox", label: "If" },
-  // Add more presets here if needed
-];
-
-const PRESET_NODES_SOMETHING = [
-  { type: "somethingBox", label: "Input Something" },
+const PRESET_NODES = [
+  {
+    label: "Set Variable",
+    type: "setVariableNode",
+    family: "node",
+  },
 ];
 
 const nodeTypes = {
-  inputBox: Box,
-  whileBox: Box,
-  notifyBox: Box,
-  executeBox: Box,
-  ifBox: Box,
-  somethingBox: Box,
-}; // Register Box as a node type
+  setVariableNode: SetVariableNode,
+};
+
+const edgeTypes = {
+  customBezier: CustomBezierEdge,
+};
 
 export default function App() {
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
-  const edgesRef = useRef(edges);
+  const [parameters, setParameters] = useState([]);
 
-  useEffect(() => {
-    edgesRef.current = edges;
-  }, [edges]);
-
-  const onMessageChange = useCallback((id, message) => {
-    setNodes((nds) => {
-      // Use the latest edges from ref
-      const outgoing = edgesRef.current.filter((e) => e.source === id);
-
-      let updatedNodes = nds.map((node) =>
-        node.id === id
-          ? {
-              ...node,
-              data: {
-                ...node.data,
-                message,
-                onMessageChange,
-              },
-            }
-          : node
-      );
-
-      if (outgoing.length > 0) {
-        updatedNodes = updatedNodes.map((node) => {
-          const isTarget = outgoing.some((e) => e.target === node.id);
-          if (isTarget) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                receivedMessage: message || "No message",
-                onMessageChange,
-              },
-            };
-          }
-          return node;
-        });
-      }
-
-      return updatedNodes;
-    });
-  }, []);
-
+  // The 2 functions handle changes to nodes and edges, part of ReactFlow's API
   const onNodesChange = useCallback(
     (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
     []
   );
+
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
     []
   );
 
+  // Handle connection between nodes (gets updated at every connection change)
   const onConnect = useCallback(
     (params) => {
-      setEdges((eds) => addEdge(params, eds));
+      const newEdge = {
+        ...params,
+        type: "customBezier",
+        data: {
+          label: `Edge ${edges.length + 1}`,
+          animated: true,
+        },
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
       setNodes((nds) => {
-        const sourceNode = nds.find((n) => n.id === params.source);
         return nds.map((node) =>
           node.id === params.target
             ? {
                 ...node,
                 data: {
                   ...node.data,
-                  receivedMessage: sourceNode?.data?.message || "No message",
-                  onMessageChange, // keep function reference
                 },
               }
             : node
         );
       });
     },
-    [setEdges, setNodes, onMessageChange]
+    [setEdges, setNodes, edges.length]
   );
 
   // Handle drag over to allow dropping
@@ -121,33 +84,103 @@ export default function App() {
     (event) => {
       event.preventDefault();
       const reactFlowBounds = event.target.getBoundingClientRect();
-      const data = event.dataTransfer.getData("application/reactflow");
-      const [type, label] = data.split(",");
-      if (!type) return;
+      // Receive preset data and turn back into object form
+      const dragData = JSON.parse(
+        event.dataTransfer.getData("application/reactflow")
+      );
+
+      // error check, data return
+      if (!dragData) {
+        console.log("No data received from drag transfer");
+        return;
+      }
+
+      if (dragData) {
+        console.log("Received drag data:", dragData);
+      }
+
+      // Destructure the drag data
+      const {
+        label: nodeLabel,
+        type: nodeType,
+        family: nodeFamily,
+        id: nodeId,
+      } = dragData;
+
+      // Check if component is supposed to be on canvas
+      if (!(nodeFamily === "node")) {
+        console.log("Not canvas placeable");
+        return;
+      }
+
+      console.log(
+        "Dropped type:",
+        nodeType,
+        "with label:",
+        nodeLabel,
+        "family:",
+        nodeFamily,
+        "and id:",
+        nodeId
+      );
 
       // Calculate position relative to canvas
-      const position = {
+      const nodePosition = {
         x: event.clientX - reactFlowBounds.left,
         y: event.clientY - reactFlowBounds.top,
       };
-      console.log("Dropped type:", type, "at position:", position);
 
-      // when dropping, the box should be placed where the pointer is
-      setNodes((nds) => [
-        ...nds,
+      // When dropping, the box should be placed where the pointer is
+      // Create a new node with the dropped type and position
+      // And update the nodes state
+      setNodes((prev) => [
+        ...prev,
         {
-          id: `${+new Date()}`,
-          type: type,
-          position: position,
+          id: nodeId,
+          type: nodeType,
+          position: nodePosition,
+          setNodes,
           data: {
-            label: `${label}`,
-            onMessageChange, // add function reference
+            label: `${nodeLabel}`,
+            parameters: parameters,
           },
         },
       ]);
     },
-    [setNodes, onMessageChange]
+    [setNodes, parameters]
   );
+
+  // Functions to add and remove a new parameter to the dashboard
+  const handleAddParameter = useCallback(() => {
+    const newItem = {
+      label: "parameter" + (parameters.length + 1),
+      value: "value" + (parameters.length + 1),
+      family: "variable",
+      id: `${+new Date()}`,
+    };
+
+    setParameters((prev) => [...prev, newItem]);
+  }, [parameters, setParameters]);
+
+  const handleRemoveParameter = useCallback(
+    (index) => {
+      setParameters((prev) => prev.filter((_, i) => i !== index));
+    },
+    [setParameters]
+  );
+
+  // Update all nodes with new parameters whenever parameters change
+  useEffect(() => {
+    setNodes((prevNodes) =>
+      prevNodes.map((node) => ({
+        ...node,
+        data: {
+          ...node.data,
+          parameters: parameters,
+        },
+      }))
+    );
+  }, [parameters]);
 
   return (
     <div style={{ width: "100vw", height: "100vh", position: "relative" }}>
@@ -158,6 +191,7 @@ export default function App() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         minZoom={0.1}
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         onDrop={onDrop}
@@ -166,18 +200,18 @@ export default function App() {
         <Background color="#ccc" variant={BackgroundVariant.Cross} />
       </ReactFlow>
 
-      <div className="box-picker">
-        <ComponentPicker
-          PRESET_NODES={PRESET_NODES_ACTIONS}
-          title="Actions"
-          nameComponentClass={"action-picker"}
-        />
-        <ComponentPicker
-          PRESET_NODES={PRESET_NODES_SOMETHING}
-          title="Something"
-          nameComponentClass={"something-picker"}
-        />
-      </div>
+      <ComponentPickerRow
+        PRESET_COMPONENTS={PRESET_NODES}
+        title="Nodes"
+        componentClassName={"node-picker"}
+      />
+
+      <ParameterDashboard
+        handleAddParameter={handleAddParameter}
+        handleRemoveParameter={handleRemoveParameter}
+        parameters={parameters}
+        setParameters={setParameters}
+      />
     </div>
   );
 }
