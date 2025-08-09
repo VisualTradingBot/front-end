@@ -1,0 +1,154 @@
+.logic-node {
+  width: 12vw;
+  min-width: max-content;
+  height: auto;
+  display: grid;
+  grid-template: 30px auto/ auto;
+  color: aliceblue;
+  text-transform: uppercase;
+
+  h3,
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    font-family: Share Tech Mono, monospace;
+    color: #131313;
+  }
+
+  .node-title {
+    grid-area: 1 / 1 / 2 / 2;
+    margin: 0;
+    padding: 5px 0;
+    background: transparent;
+    border-bottom: aliceblue solid 1px;
+  }
+
+  .bellow-title {
+    display: grid;
+    grid-area: 2 / 1 / 3 / 2;
+    grid-template: auto 40px / auto;
+
+    background: #131313;
+    .main-contents {
+      font-family: monospace;
+      font-weight: 400;
+      background: #131313;
+      grid-area: 1 / 1 / 2 / 2;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+
+      .drop-zones-container {
+        padding: 10px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .drop-zone-row {
+          display: flex;
+          align-items: center;
+
+          .left-connections {
+            width: 0px;
+            position: absolute;
+            left: -8%;
+          }
+
+          .right-connections {
+            width: 0px;
+            position: absolute;
+            right: -10%;
+          }
+          div {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+
+            .zone-label {
+              font-size: 0.9rem;
+              font-weight: 500;
+              min-width: 35px;
+              color: #b2b1b9;
+            }
+
+            .drop-zone {
+              flex: 1;
+              min-height: 30px;
+              min-width: 80px;
+              border: 2px dashed #504f4f;
+              border-radius: 4px;
+              background: rgba(50, 50, 50, 0.3);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: all 0.2s ease-in-out;
+              position: relative;
+
+              &.drag-over {
+                border-color: #4caf50;
+                background: rgba(76, 175, 80, 0.1);
+                transform: scale(1.02);
+                box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+              }
+
+              .empty-zone {
+                color: #888;
+                font-size: 0.8rem;
+                pointer-events: none;
+              }
+
+              .placed-block {
+                background: #4caf50;
+                color: white;
+                padding: 6px 12px;
+                border-radius: 4px;
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                box-sizing: border-box;
+                span {
+                  h3 {
+                    font-size: 0.9rem;
+                    font-weight: 500;
+                    margin: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .bottom-add-btn {
+      grid-area: 2 / 1 / 3 / 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 500;
+        font-family: Share Tech Mono, monospace;
+
+        &:hover {
+          background-color: #45a049;
+        }
+      }
+    }
+  }
+}
