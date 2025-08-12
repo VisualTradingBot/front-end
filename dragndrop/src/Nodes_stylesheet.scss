@@ -1,6 +1,5 @@
 .logic-node {
-  width: 12vw;
-  min-width: max-content;
+  min-width: 280px;
   height: auto;
   display: grid;
   grid-template: 30px auto/ auto;
@@ -45,18 +44,14 @@
 
       .drop-zones-container {
         padding: 10px 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
 
         .drop-zone-row {
           display: flex;
           align-items: center;
-
           .left-connections {
             width: 0px;
             position: absolute;
-            left: -8%;
+            left: -20px;
           }
 
           .right-connections {
@@ -65,8 +60,9 @@
             right: -10%;
           }
           div {
+            width: 100%;
             display: flex;
-            gap: 20px;
+            justify-content: space-around;
             align-items: center;
 
             .zone-label {
@@ -77,9 +73,9 @@
             }
 
             .drop-zone {
-              flex: 1;
               min-height: 30px;
-              min-width: 80px;
+              min-width: 100px;
+              width: fit-content;
               border: 2px dashed #504f4f;
               border-radius: 4px;
               background: rgba(50, 50, 50, 0.3);
@@ -88,6 +84,7 @@
               justify-content: center;
               transition: all 0.2s ease-in-out;
               position: relative;
+              transition: all 0.2s ease-in-out;
 
               &.drag-over {
                 border-color: #4caf50;
@@ -111,7 +108,7 @@
                 gap: 10px;
                 align-items: center;
                 justify-content: space-between;
-                width: 100%;
+                width: fit-content;
                 box-sizing: border-box;
                 span {
                   h3 {
@@ -150,5 +147,68 @@
         }
       }
     }
+  }
+}
+
+.group-parent {
+  min-width: 300px;
+  min-height: 200px;
+  height: 100%;
+  transition: all 0.2s ease-in-out;
+  
+  &.drag-over {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  }
+  
+  .group-inside {
+    border-radius: 8px;
+    padding: 10px;
+    width: auto;
+    height: auto;
+    
+    .group-header {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      padding: 10px;
+      text-align: center;
+    }
+    
+    .group-content {
+      color: #9ca3af;
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      
+      .child-nodes-info {
+        color: #6b7280;
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+      
+      .drop-hint {
+        color: #3b82f6;
+        font-size: 14px;
+        font-weight: 500;
+        text-align: center;
+        padding: 20px;
+        border: 2px dashed #3b82f6;
+        border-radius: 8px;
+        background: rgba(59, 130, 246, 0.05);
+        animation: pulse 2s infinite;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
   }
 }
