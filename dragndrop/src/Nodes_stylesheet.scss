@@ -1,9 +1,16 @@
+.node-group-title {
+  position: absolute;
+  top: -30px;
+  padding: 5px 0;
+  background: transparent;
+  text-transform: uppercase;
+  font-family: Share Tech Mono, monospace;
+  color: #131313;
+}
+
 .logic-node {
-  width: 12vw;
-  min-width: max-content;
+  min-width: 280px;
   height: auto;
-  display: grid;
-  grid-template: 30px auto/ auto;
   color: aliceblue;
   text-transform: uppercase;
 
@@ -16,21 +23,10 @@
   h3 {
     font-size: 1.2rem;
     font-weight: 500;
-    font-family: Share Tech Mono, monospace;
-    color: #131313;
-  }
-
-  .node-title {
-    grid-area: 1 / 1 / 2 / 2;
-    margin: 0;
-    padding: 5px 0;
-    background: transparent;
-    border-bottom: aliceblue solid 1px;
   }
 
   .bellow-title {
     display: grid;
-    grid-area: 2 / 1 / 3 / 2;
     grid-template: auto 40px / auto;
 
     background: #131313;
@@ -45,9 +41,6 @@
 
       .drop-zones-container {
         padding: 10px 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
 
         .drop-zone-row {
           display: flex;
@@ -56,17 +49,13 @@
           .left-connections {
             width: 0px;
             position: absolute;
-            left: -8%;
+            left: -20px;
           }
 
-          .right-connections {
-            width: 0px;
-            position: absolute;
-            right: -10%;
-          }
           div {
+            width: 100%;
             display: flex;
-            gap: 20px;
+            justify-content: space-around;
             align-items: center;
 
             .zone-label {
@@ -77,9 +66,9 @@
             }
 
             .drop-zone {
-              flex: 1;
               min-height: 30px;
-              min-width: 80px;
+              min-width: 100px;
+              width: fit-content;
               border: 2px dashed #504f4f;
               border-radius: 4px;
               background: rgba(50, 50, 50, 0.3);
@@ -92,7 +81,7 @@
               &.drag-over {
                 border-color: #4caf50;
                 background: rgba(76, 175, 80, 0.1);
-                transform: scale(1.02);
+                transform: scale(1.1);
                 box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
               }
 
@@ -111,7 +100,7 @@
                 gap: 10px;
                 align-items: center;
                 justify-content: space-between;
-                width: 100%;
+                width: fit-content;
                 box-sizing: border-box;
                 span {
                   h3 {
@@ -150,5 +139,65 @@
         }
       }
     }
+  }
+}
+
+.group-parent {
+  min-width: 300px;
+  min-height: 200px;
+  height: 100%;
+  transition: all 0.3s ease-in-out;
+  border-radius: 10px;
+
+  h3,
+  p {
+    margin: 0;
+    padding: 0;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+
+  &.drag-over {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+  }
+  .group-inside {
+    border-radius: 8px;
+    padding: 10px;
+    width: auto;
+    height: auto;
+
+    .group-content {
+      .child-nodes-info {
+        color: #6b7280;
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+
+      .drop-hint {
+        color: #3b82f6;
+        text-align: center;
+        padding: 20px;
+        border: 2px dashed #3b82f6;
+        border-radius: 8px;
+        background: rgba(59, 130, 246, 0.05);
+        animation: pulse 2s infinite;
+        font-size: 0.8rem;
+        font-family: Share Tech Mono, monospace;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
   }
 }

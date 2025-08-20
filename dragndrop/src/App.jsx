@@ -1,6 +1,6 @@
 import "./App.scss";
 import ComponentPickerRow from "./ComponentPickerRow.jsx";
-import { SetVariableNode } from "./Nodes.jsx";
+import { SetVariableNode, GroupParent } from "./Nodes.jsx";
 import ParameterDashboard from "./ParameterDashboard.jsx";
 import { CustomBezierEdge } from "./components.jsx";
 
@@ -20,10 +20,16 @@ const PRESET_NODES = [
     type: "setVariableNode",
     family: "node",
   },
+  {
+    label: "Group Parent",
+    type: "groupParent",
+    family: "group",
+  },
 ];
 
 const nodeTypes = {
   setVariableNode: SetVariableNode,
+  groupParent: GroupParent,
 };
 
 const edgeTypes = {
@@ -36,10 +42,9 @@ export default function App() {
   const [parameters, setParameters] = useState([]);
 
   // The 2 functions handle changes to nodes and edges, part of ReactFlow's API
-  const onNodesChange = useCallback(
-    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
-    []
-  );
+  const onNodesChange = useCallback((changes) => {
+    setNodes((nds) => applyNodeChanges(changes, nds));
+  }, []);
 
   const onEdgesChange = useCallback(
     (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
@@ -108,9 +113,86 @@ export default function App() {
       } = dragData;
 
       // Check if component is supposed to be on canvas
-      if (!(nodeFamily === "node")) {
+      if (!(nodeFamily === "node" || nodeFamily === "group")) {
         console.log("Not canvas placeable");
         return;
+      }
+
+      // Calculate position relative to canvas
+      const nodePosition = {
+        x: event.clientX - reactFlowBounds.left,
+        y: event.clientY - reactFlowBounds.top,
+      };
+
+      // Check if the drop is inside a group node
+      const findGroupUnderCursor = (x, y) => {
+        return nodes.find((node) => {
+          if (node.type !== "groupParent") return false;
+
+          // Get the node's rendered position and size
+          const nodeElement = document.querySelector(`[data-id="${node.id}"]`);
+          if (!nodeElement) return false;
+
+          const rect = nodeElement.getBoundingClientRect();
+          const canvasRect = reactFlowBounds;
+
+          // Convert screen coordinates to canvas coordinates
+          const canvasX = x + canvasRect.left;
+          const canvasY = y + canvasRect.top;
+
+          return (
+            canvasX >= rect.left &&
+            canvasX <= rect.right &&
+            canvasY >= rect.top &&
+            canvasY <= rect.bottom
+          );
+        });
+      };
+
+      const parentGroup = findGroupUnderCursor(
+        event.clientX - reactFlowBounds.left,
+        event.clientY - reactFlowBounds.top
+      );
+
+      // If dropping inside a group, let the group handle it
+      if (parentGroup && nodeFamily === "node") {
+        console.log(
+          "Drop inside group will be handled by GroupParent component"
+        );
+        return;
+      }
+
+      // when dropping, the box should be placed where the pointer is
+      // update the nodes state
+      // check wether node or subflow (group)
+      {
+        nodeFamily === "node"
+          ? setNodes((prev) => [
+              ...prev,
+              {
+                id: `node-${nodeId}`,
+                type: nodeType,
+                position: nodePosition,
+                data: {
+                  label: `${nodeLabel}`,
+                  parameters: parameters,
+                },
+              },
+            ])
+          : setNodes((prev) => [
+              ...prev,
+              {
+                id: `group-${nodeId}`,
+                type: nodeType,
+                position: nodePosition,
+                data: {
+                  label: `${nodeLabel}`,
+                  parameters: parameters,
+                  nodes: nodes,
+                  setNodes: setNodes,
+                },
+              },
+            ]);
       }
 
       console.log(
@@ -123,31 +205,8 @@ export default function App() {
         "and id:",
         nodeId
       );
-
-      // Calculate position relative to canvas
-      const nodePosition = {
-        x: event.clientX - reactFlowBounds.left,
-        y: event.clientY - reactFlowBounds.top,
-      };
-
-      // When dropping, the box should be placed where the pointer is
-      // Create a new node with the dropped type and position
-      // And update the nodes state
-      setNodes((prev) => [
-        ...prev,
-        {
-          id: nodeId,
-          type: nodeType,
-          position: nodePosition,
-          setNodes,
-          data: {
-            label: `${nodeLabel}`,
-            parameters: parameters,
-          },
-        },
-      ]);
     },
-    [setNodes, parameters]
+    [parameters, nodes]
   );
 
   // Functions to add and remove a new parameter to the dashboard
