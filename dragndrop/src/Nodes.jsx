@@ -16,7 +16,7 @@ function SetVariableNode({ data, selected }) {
   const [dragOverZone, setDragOverZone] = useState(null);
   const [isValidDrop, setIsValidDrop] = useState(true);
   const [variableNum, setVariableNum] = useState(1);
-  const [minHeightResizeBox, setMinHeightResizeBox] = useState(124);
+  const [minHeightResizeBox, setMinHeightResizeBox] = useState(94);
 
   // Check if a component is compatible with a drop zone
   const isCompatible = useCallback((componentFamily, zoneId) => {
@@ -136,9 +136,11 @@ function SetVariableNode({ data, selected }) {
 
   const addVariable = () => {
     setVariableNum((prev) => prev + 1);
-    setMinHeightResizeBox(124 + 54 * (variableNum - 1));
-    console.log("Min height resize box:");
   };
+
+  useEffect(() => {
+    setMinHeightResizeBox(94 + 54 * (variableNum - 1));
+  }, [variableNum]);
 
   // Clean up blocks when parameters are deleted and update labels when changed
   useEffect(() => {
@@ -183,9 +185,10 @@ function SetVariableNode({ data, selected }) {
         isVisible={selected}
       />
       <div className="logic-node" style={{}}>
-        <div className="node-title">
-          <h3>{data?.label || "Interactive Node"}</h3>
-        </div>
+        <h3 className="node-group-title">
+          {data?.label || "Interactive Node"}
+        </h3>
+
         <div className="bellow-title">
           <div className="main-contents">
             {Children.toArray(
@@ -369,9 +372,8 @@ function GroupParent({ data, selected, id }) {
           position: "relative",
         }}
       >
+        <h3 className="node-group-title">{data?.label || "Subflow Group"}</h3>
         <div className="group-inside">
-          <div className="group-header">{data?.label || "Subflow Group"}</div>
-
           <div className="group-content">
             {childNodes.length > 0 && (
               <div className="child-nodes-info">
