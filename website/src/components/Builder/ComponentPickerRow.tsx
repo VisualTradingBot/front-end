@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import "./ComponentPickerRow_stylesheet.scss";
+import { PresetNode } from "../../components/Builder/components";
 
 // Carousel component for picking components
 export default function ComponentPickerRow({
@@ -7,7 +8,7 @@ export default function ComponentPickerRow({
   title,
   componentClassName,
 }) {
-  const scrollContainerRef = useRef(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -42,7 +43,7 @@ export default function ComponentPickerRow({
               draggable
               onDragStart={(event) => {
                 // Set the data to be transferred during the drag
-                const dragData = {
+                const dragData: PresetNode = {
                   label: preset.label,
                   type: preset.type,
                   family: preset.family,

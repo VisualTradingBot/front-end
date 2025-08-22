@@ -41,9 +41,3 @@ export default function HomePage() {
     </>
   );
 }
-
-function Showcase() {
-  return (
-    <Spline scene="https://prod.spline.design/xZ8Zc1uatcCkfg03/scene.splinecode" />
-  );
-}

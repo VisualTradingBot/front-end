@@ -5,7 +5,6 @@ import {
   GroupParent,
 } from "../../components/Builder/Nodes.jsx";
 import ParameterDashboard from "../../components/Builder/ParameterDashboard.jsx";
-import { CustomBezierEdge } from "../../components/Builder/components.jsx";
 
 import { useCallback, useState, useEffect } from "react";
 import {
@@ -15,10 +14,14 @@ import {
   BackgroundVariant,
   applyNodeChanges,
   applyEdgeChanges,
+  Edge,
+  Node,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
-const PRESET_NODES = [
+import { Parameter, PresetNode } from "../../components/Builder/components";
+
+const PRESET_NODES: PresetNode[] = [
   {
     label: "Set Variable",
     type: "setVariableNode",
@@ -36,14 +39,10 @@ const nodeTypes = {
   groupParent: GroupParent,
 };
 
-const edgeTypes = {
-  customBezier: CustomBezierEdge,
-};
-
 export default function Builder() {
-  const [nodes, setNodes] = useState([]);
-  const [edges, setEdges] = useState([]);
-  const [parameters, setParameters] = useState([]);
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const [parameters, setParameters] = useState<Parameter[]>([]);
 
   // The 2 functions handle changes to nodes and edges, part of ReactFlow's API
   const onNodesChange = useCallback((changes) => {
@@ -58,12 +57,10 @@ export default function Builder() {
   // Handle connection between nodes (gets updated at every connection change)
   const onConnect = useCallback(
     (params) => {
-      const newEdge = {
+      const newEdge: Edge = {
         ...params,
-        type: "customBezier",
         data: {
           label: `Edge ${edges.length + 1}`,
-          animated: true,
         },
       };
       setEdges((eds) => addEdge(newEdge, eds));
@@ -169,60 +166,50 @@ export default function Builder() {
       // when dropping, the box should be placed where the pointer is
       // update the nodes state
       // check wether node or subflow (group)
-      {
-        nodeFamily === "node"
-          ? setNodes((prev) => [
-              ...prev,
-              {
-                id: `node-${nodeId}`,
-                type: nodeType,
-                position: nodePosition,
-                data: {
-                  label: `${nodeLabel}`,
-                  parameters: parameters,
-                },
-              },
-            ])
-          : setNodes((prev) => [
-              ...prev,
-              {
-                id: `group-${nodeId}`,
-                type: nodeType,
-                position: nodePosition,
-                data: {
-                  label: `${nodeLabel}`,
-                  parameters: parameters,
-                  nodes: nodes,
-                  setNodes: setNodes,
-                },
-              },
-            ]);
-      }
 
-      console.log(
-        "Dropped type:",
-        nodeType,
-        "with label:",
-        nodeLabel,
-        "family:",
-        nodeFamily,
-        "and id:",
-        nodeId
-      );
+      // Create the new node object first
+      const newNode: Node =
+        nodeFamily === "node"
+          ? {
+              id: `node-${nodeId}`,
+              type: nodeType,
+              position: nodePosition,
+              data: {
+                label: `${nodeLabel}`,
+                parameters: parameters,
+              },
+            }
+          : {
+              id: `group-${nodeId}`,
+              type: nodeType,
+              position: nodePosition,
+              data: {
+                label: `${nodeLabel}`,
+                parameters: parameters,
+                nodes: nodes,
+                setNodes: setNodes,
+              },
+            };
+
+      // Add to state
+      setNodes((prev) => [...prev, newNode]);
+
+      // Log the node you just created
+      console.log("Dropped node with following properties:", newNode);
     },
     [parameters, nodes]
   );
 
   // Functions to add and remove a new parameter to the dashboard
   const handleAddParameter = useCallback(() => {
-    const newItem = {
+    const newParameter: Parameter = {
       label: "parameter" + (parameters.length + 1),
       value: "value" + (parameters.length + 1),
       family: "variable",
       id: `${+new Date()}`,
     };
 
-    setParameters((prev) => [...prev, newItem]);
+    setParameters((prev) => [...prev, newParameter]);
   }, [parameters, setParameters]);
 
   const handleRemoveParameter = useCallback(
@@ -254,7 +241,6 @@ export default function Builder() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
-        edgeTypes={edgeTypes}
         minZoom={0.1}
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         onDrop={onDrop}
