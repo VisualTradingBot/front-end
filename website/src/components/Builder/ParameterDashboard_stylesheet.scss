@@ -34,6 +34,29 @@
         padding: 5px 0;
         border-bottom: 1px solid #444;
 
+        .parameter-text-input {
+          background: transparent;
+          border: 1px solid #4caf50;
+          color: aliceblue;
+          padding: 2px 4px;
+          border-radius: 2px;
+          font-size: 0.9rem;
+          font-family: "Share Tech Mono, monospace";
+          width: 60%;
+        }
+
+        .parameter-number-input {
+          background: transparent;
+          border: 1px solid #4caf50;
+          color: aliceblue;
+          padding: 2px 4px;
+          border-radius: 2px;
+          font-size: 0.9rem;
+          font-family: "Share Tech Mono, monospace";
+          margin-right: 8px;
+          width: 30%;
+        }
+
         span:nth-child(1) {
           span {
             transition: color 0.2s ease;

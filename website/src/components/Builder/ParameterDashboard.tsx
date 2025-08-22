@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
-import { ButtonDelete, Box } from "./components.jsx";
+import { ButtonDelete } from "./components.jsx";
 import "./ParameterDashboard_stylesheet.scss";
+import { Parameter } from "./components.jsx";
 
 export default function ParameterDashboard({
   handleRemoveParameter,
@@ -60,6 +61,7 @@ export default function ParameterDashboard({
               <span>
                 {editingIndex === index && editingField === "label" ? (
                   <input
+                    className="parameter-text-input"
                     type="text"
                     value={tempValue}
                     onChange={(e) => setTempValue(e.target.value)}
@@ -67,16 +69,6 @@ export default function ParameterDashboard({
                     onKeyDown={handleKeyPress}
                     onFocus={() => setTempValue("")}
                     autoFocus
-                    style={{
-                      background: "transparent",
-                      border: "1px solid #4caf50",
-                      color: "aliceblue",
-                      padding: "2px 4px",
-                      borderRadius: "2px",
-                      fontSize: "0.9rem",
-                      fontFamily: "Share Tech Mono, monospace",
-                      width: "60%",
-                    }}
                   />
                 ) : (
                   <span
@@ -84,7 +76,7 @@ export default function ParameterDashboard({
                     draggable
                     onDragStart={(event) => {
                       // Set the data to be transferred during the drag
-                      const dragData = {
+                      const dragData: Parameter = {
                         label: param.label,
                         value: param.value,
                         family: "variable",
@@ -108,23 +100,13 @@ export default function ParameterDashboard({
               <span>
                 {editingIndex === index && editingField === "value" ? (
                   <input
+                    className="parameter-number-input"
                     type="number"
                     value={tempValue}
                     onChange={(e) => setTempValue(e.target.value)}
                     onBlur={saveEdit}
                     onKeyDown={handleKeyPress}
                     autoFocus
-                    style={{
-                      background: "transparent",
-                      border: "1px solid #4caf50",
-                      color: "aliceblue",
-                      padding: "2px 4px",
-                      borderRadius: "2px",
-                      fontSize: "0.9rem",
-                      fontFamily: "Share Tech Mono, monospace",
-                      marginRight: "8px",
-                      width: "30%",
-                    }}
                   />
                 ) : (
                   <span

@@ -1,7 +1,7 @@
 import "./Nodes_stylesheet.scss";
 import { useMemo, useState, useCallback, useEffect, Children } from "react";
 import { Handle, Position, NodeResizer } from "@xyflow/react";
-import { ButtonDelete, Box } from "./components.jsx";
+import { ButtonDelete, Box, NewBlock, Parameter } from "./components.jsx";
 export { SetVariableNode, GroupParent };
 
 const ZONE_COMPATIBILITY = {
@@ -11,8 +11,11 @@ const ZONE_COMPATIBILITY = {
 };
 
 function SetVariableNode({ data, selected }) {
-  const parameters = useMemo(() => data?.parameters || [], [data?.parameters]);
-  const [blocks, setBlocks] = useState([]);
+  const parameters = useMemo(
+    () => data?.parameters || [],
+    [data?.parameters]
+  ) as Parameter[];
+  const [blocks, setBlocks] = useState<NewBlock[]>([]);
   const [dragOverZone, setDragOverZone] = useState(null);
   const [isValidDrop, setIsValidDrop] = useState(true);
   const [variableNum, setVariableNum] = useState(1);
@@ -51,20 +54,24 @@ function SetVariableNode({ data, selected }) {
       const blockData = JSON.parse(
         event.dataTransfer.getData("application/reactflow")
       );
+      console.log(blockData);
 
       if (!blockData) return;
 
-      const {
-        label: paramLabel,
-        value: paramValue,
-        family: paramFamily,
-        id: paramId,
-      } = blockData;
+      // Create a new block object
+      const newBlock: NewBlock = {
+        placedId: `block-${Date.now()}`,
+        family: blockData.family,
+        parameterId: blockData.id, // Store parameter ID for tracking
+        label: blockData.label,
+        zoneId: zoneId,
+        value: blockData.value,
+      };
 
       // Final compatibility check before dropping
-      if (!isCompatible(paramFamily, zoneId)) {
+      if (!isCompatible(blockData.family, zoneId)) {
         console.log(
-          `Incompatible drop: ${paramFamily} cannot be placed in ${zoneId} zone`
+          `Incompatible drop: ${blockData.family} cannot be placed in ${zoneId} zone`
         );
         setDragOverZone(null);
         setIsValidDrop(true);
@@ -72,25 +79,19 @@ function SetVariableNode({ data, selected }) {
       }
 
       // If already exists, do not add again
-      if (blocks.some((b) => b.zoneId === zoneId && b.label === paramLabel)) {
-        console.log(`Block ${paramLabel} already exists`);
+      if (
+        blocks.some(
+          (block) => block.zoneId === zoneId && block.label === newBlock.label
+        )
+      ) {
+        console.log(`Block ${newBlock.label} already exists`);
         setDragOverZone(null);
         setIsValidDrop(true);
         return; // Reject the drop
       }
 
-      // Create a new block object
-      const newBlock = {
-        id: `block-${Date.now()}`,
-        label: paramLabel,
-        zoneId: zoneId,
-        value: paramValue,
-        family: paramFamily,
-        parameterId: paramId, // Store parameter ID for tracking
-      };
-
       setBlocks((prev) => [
-        ...prev.filter((b) => b.zoneId !== zoneId),
+        ...prev.filter((block) => block.zoneId !== zoneId),
         newBlock,
       ]);
       setDragOverZone(null);
@@ -124,12 +125,14 @@ function SetVariableNode({ data, selected }) {
   }, []);
 
   const removeBlock = (blockId) => {
-    setBlocks((prev) => prev.filter((b) => b.id !== blockId));
+    setBlocks((prev) => prev.filter((block) => block.placedId !== blockId));
   };
 
   const removeVariable = (variableIndex) => {
     setBlocks((prev) =>
-      prev.filter((b) => !b.zoneId.startsWith(`variable-${variableIndex}`))
+      prev.filter(
+        (block) => !block.zoneId.startsWith(`variable-${variableIndex}`)
+      )
     );
     setVariableNum((prev) => Math.max(prev - 1, 1));
   };
@@ -156,18 +159,20 @@ function SetVariableNode({ data, selected }) {
             );
           })
           .map((block) => {
-            // Update labels for variable blocks if parameter label changed
             if (
               block.family === "variable" &&
               parameterMap.has(block.parameterId)
             ) {
               const parameter = parameterMap.get(block.parameterId);
-              return {
-                ...block,
-                label: parameter.label,
-                value: parameter.value,
-                parameterLabel: parameter.label,
-              };
+              if (parameter) {
+                // Explicit check
+                return {
+                  ...block,
+                  label: parameter.label,
+                  value: Number(parameter.value),
+                  parameterLabel: parameter.label,
+                };
+              }
             }
             return block;
           })
@@ -227,15 +232,19 @@ function SetVariableNode({ data, selected }) {
                           onDragOver={(e) => handleDragOver(e, zoneId)}
                           onDragLeave={handleDragLeave}
                         >
-                          {blocks.find((b) => b.zoneId === zoneId) ? (
+                          {blocks.find((block) => block.zoneId === zoneId) ? (
                             <div className="placed-block">
                               <Box
-                                data={blocks.find((b) => b.zoneId === zoneId)}
+                                data={blocks.find(
+                                  (block) => block.zoneId === zoneId
+                                )}
                               />
                               <ButtonDelete
                                 onClick={() =>
                                   removeBlock(
-                                    blocks.find((b) => b.zoneId === zoneId).id
+                                    blocks.find(
+                                      (block) => block.zoneId === zoneId
+                                    )?.placedId
                                   )
                                 }
                               />
